@@ -1,0 +1,31 @@
+{
+  "name": "twitch-chat-bot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Single-channel Twitch bot for custom chat commands",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && mkdir -p dist/storage/migrations && cp src/storage/migrations/*.sql dist/storage/migrations/",
+    "start": "node --env-file=.env dist/index.js",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "migrate": "pnpm run build && node dist/storage/migrate.js",
+    "test": "vitest run",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@twurple/api": "^7.2.1",
+    "@twurple/auth": "^7.2.1",
+    "@twurple/eventsub-ws": "^7.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/node": "^24.0.0",
+    "eslint": "^9.13.0",
+    "prettier": "^3.3.3",
+    "typescript": "^7.0.2",
+    "vitest": "^2.1.4"
+  }
+}
