@@ -1,2 +1,6 @@
+packages:
+  - backend
+  - ui
+
 allowBuilds:
   esbuild: true

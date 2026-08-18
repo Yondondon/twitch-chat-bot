@@ -5,6 +5,14 @@ export interface Config {
   broadcasterAccessToken: string;
   broadcasterRefreshToken: string;
   databasePath: string;
+  /** Must exactly match a redirect URI registered on the Twitch app (research.md §3). */
+  twitchRedirectUri: string;
+  /** Signs the dashboard's session cookie (research.md §3). */
+  sessionSecret: string;
+  /** Origin the UI is served from — used for CORS and the post-login redirect. */
+  uiOrigin: string;
+  /** Port the dashboard's HTTP API listens on. */
+  httpPort: number;
 }
 
 const REQUIRED_ENV_VARS = [
@@ -13,6 +21,9 @@ const REQUIRED_ENV_VARS = [
   "BROADCASTER_USER_ID",
   "BROADCASTER_ACCESS_TOKEN",
   "BROADCASTER_REFRESH_TOKEN",
+  "TWITCH_REDIRECT_URI",
+  "SESSION_SECRET",
+  "UI_ORIGIN",
 ] as const;
 
 /**
@@ -33,5 +44,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     broadcasterAccessToken: env.BROADCASTER_ACCESS_TOKEN!,
     broadcasterRefreshToken: env.BROADCASTER_REFRESH_TOKEN!,
     databasePath: env.DATABASE_PATH ?? "./data/bot.sqlite",
+    twitchRedirectUri: env.TWITCH_REDIRECT_URI!,
+    sessionSecret: env.SESSION_SECRET!,
+    uiOrigin: env.UI_ORIGIN!,
+    httpPort: Number(env.HTTP_PORT ?? "8787"),
   };
 }
