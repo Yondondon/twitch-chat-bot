@@ -58,6 +58,14 @@ export class CommandRepository {
     return this.findById(Number(result.lastInsertRowid))!;
   }
 
+  /** All commands, ordered by trigger — backs the public `GET /api/commands` listing. */
+  list(): CommandRecord[] {
+    const rows = this.db
+      .prepare("SELECT * FROM commands ORDER BY trigger COLLATE NOCASE")
+      .all() as unknown as CommandRow[];
+    return rows.map(toRecord);
+  }
+
   findById(id: number): CommandRecord | null {
     const row = this.db.prepare("SELECT * FROM commands WHERE id = ?").get(id) as
       | CommandRow
@@ -78,6 +86,22 @@ export class CommandRepository {
     this.db
       .prepare("UPDATE commands SET reply_text = ?, updated_at = ? WHERE id = ?")
       .run(replyText, now, id);
+    return this.findById(id)!;
+  }
+
+  /** Updates whichever of `trigger`/`replyText` is provided — used by the UI's rename-capable edit (data-model.md). */
+  update(id: number, changes: { trigger?: string; replyText?: string }): CommandRecord {
+    const now = new Date().toISOString();
+    if (changes.trigger !== undefined) {
+      this.db
+        .prepare("UPDATE commands SET trigger = ?, updated_at = ? WHERE id = ?")
+        .run(changes.trigger, now, id);
+    }
+    if (changes.replyText !== undefined) {
+      this.db
+        .prepare("UPDATE commands SET reply_text = ?, updated_at = ? WHERE id = ?")
+        .run(changes.replyText, now, id);
+    }
     return this.findById(id)!;
   }
 

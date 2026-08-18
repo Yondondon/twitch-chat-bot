@@ -123,7 +123,7 @@ async function replyToManagementAction(
 function rejectionMessage(
   action: "add" | "edit" | "delete",
   trigger: string,
-  reason: "duplicate" | "not_found" | "reserved_trigger",
+  reason: "duplicate" | "not_found" | "reserved_trigger" | "empty_trigger" | "empty_reply_text",
 ): string {
   switch (reason) {
     case "duplicate":
@@ -132,6 +132,12 @@ function rejectionMessage(
       return `Command !${trigger} doesn't exist.`;
     case "reserved_trigger":
       return `!${trigger} is a reserved name and can't be used as a command.`;
+    case "empty_trigger":
+    case "empty_reply_text":
+      // Unreachable via chat: parser.ts already filters blank trigger/reply
+      // text before a management action reaches the service (FR-009 is
+      // enforced here only for the HTTP path, which has no such pre-filter).
+      return `Command !${trigger} needs both a trigger and reply text.`;
   }
   void action;
 }
